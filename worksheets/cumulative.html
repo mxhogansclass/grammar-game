@@ -40,18 +40,18 @@
     <div class="meta">
       <span>📝 50 Questions</span>
       <span>⭐ 50 Points Possible</span>
-      <span>🕐 ~40 minutes</span>
+      <span>🕐 ~60 minutes</span>
     </div>
   </div>
 
   <div class="student-id-section" id="student-id-section"></div>
 
   <div class="instructions">
-    <strong>Directions:</strong> This worksheet covers <strong>all four grammar topics</strong>. Each question specifies what you are identifying. Read the sentence and the question carefully — some sentences test multiple skills at once. Questions are grouped by topic but increase in complexity throughout. Each correct answer is worth <strong>1.5 points</strong>.
+    <strong>Directions:</strong> This worksheet covers <strong>all four grammar topics</strong>. Each question specifies what you are identifying. Read the sentence and the question carefully — some sentences test multiple skills at once. Questions are grouped by topic but increase in complexity throughout. Each correct answer is worth <strong>1 point</strong>.
   </div>
 
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
-  <div class="progress-text" id="progress-text">0 of 20 answered</div>
+  <div class="progress-text" id="progress-text">0 of 50 answered</div>
 
   <div id="questions-container"></div>
 
@@ -64,11 +64,6 @@
 <script src="../js/core.js"></script>
 <script>
 
-const QUESTIONS = [
-
- Here's the full 50-question array. Find `const QUESTIONS = [...]` in your `cumulative.html` and replace the whole thing:
-
-```javascript
 const QUESTIONS = [
 
   // ══ SECTION 1: PARTS OF SPEECH (Q1–15) ═══════════════════
@@ -636,7 +631,6 @@ const QUESTIONS = [
     correct: 2,
     explanation: '"That the vote be delayed until all members had reviewed the full text of the bill" is the direct object of "insisted" — a noun clause. Two independent clauses joined by "yet" plus this subordinate clause = compound-complex.'
   },
-
 ];
 GG.initStudentWidget();
 GG.runWorksheet({
