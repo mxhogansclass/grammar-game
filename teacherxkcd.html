@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+  const PASSWORD = "cricket26"; // change this to whatever you want
+  const entered = sessionStorage.getItem('teacher_auth');
+  if (entered !== PASSWORD) {
+    const attempt = prompt("Enter teacher password:");
+    if (attempt !== PASSWORD) {
+      alert("Incorrect password.");
+      window.location.href = "index.html";
+    } else {
+      sessionStorage.setItem('teacher_auth', PASSWORD);
+    }
+  }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Teacher Dashboard — Grammar Quest</title>
