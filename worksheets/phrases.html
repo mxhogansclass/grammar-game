@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phrases — Grammar Quest</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .question-text .phrase-mark {
+    font-style: normal;
+    border-bottom: 2.5px dashed var(--blue);
+    padding-bottom: 1px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Grammar Quest</h1>
+  <nav>
+    <a href="../index.html">← Home</a>
+    <a href="../leaderboard.html">🏆 Leaderboard</a>
+  </nav>
+</header>
+<div class="scoreboard-bar" id="scoreboard-bar"></div>
+
+<div class="page">
+  <div class="worksheet-header">
+    <span class="badge">Worksheet 3</span>
+    <h2>Phrases</h2>
+    <p class="subtitle">Identify the type of phrase marked with a dashed underline.</p>
+    <div class="meta">
+      <span>📝 20 Questions</span>
+      <span>⭐ 10 Points Possible</span>
+      <span>🕐 ~25 minutes</span>
+    </div>
+  </div>
+
+  <div class="student-id-section" id="student-id-section"></div>
+
+  <div class="instructions">
+    <strong>Directions:</strong> Each sentence contains one phrase marked with a <span style="border-bottom:2.5px dashed var(--blue);padding:0 3px">dashed underline</span>. Identify the <strong>type of phrase</strong>: <strong>prepositional phrase</strong> (noun or adverb function), <strong>participial phrase</strong>, <strong>gerund phrase</strong>, <strong>infinitive phrase</strong> (noun, adjective, or adverb function), <strong>noun phrase</strong>, <strong>verb phrase</strong>, or <strong>absolute phrase</strong>. Pay attention to how the phrase functions in the sentence!
+  </div>
+
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text">0 of 20 answered</div>
+
+  <div id="questions-container"></div>
+
+  <div style="margin-top:28px">
+    <button class="submit-btn" id="submit-btn" disabled>Submit Worksheet</button>
+  </div>
+  <div class="results-panel" id="results-panel"></div>
+</div>
+
+<script src="../js/core.js"></script>
+<script>
+
+const QUESTIONS = [
+
+  // ── EASY (1–6) ────────────────────────────────────────────
+  {
+    text: `The cat slept <span class="phrase-mark">on the warm rug</span> all afternoon.`,
+    choices: [
+      { label:'A', text:'Gerund phrase' },
+      { label:'B', text:'Prepositional phrase (adverbial — tells where)' },
+      { label:'C', text:'Participial phrase' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 1,
+    explanation: '"On the warm rug" begins with a preposition (on) and tells where the cat slept — an adverbial prepositional phrase.'
+  },
+  {
+    text: `<span class="phrase-mark">Running every morning</span> keeps her energized for the whole day.`,
+    choices: [
+      { label:'A', text:'Participial phrase modifying "her"' },
+      { label:'B', text:'Infinitive phrase used as subject' },
+      { label:'C', text:'Gerund phrase used as subject' },
+      { label:'D', text:'Absolute phrase' },
+    ],
+    correct: 2,
+    explanation: '"Running every morning" uses a gerund (verb-ing as a noun) as the subject of the sentence — a gerund phrase.'
+  },
+  {
+    text: `She wanted <span class="phrase-mark">to become a marine biologist</span>.`,
+    choices: [
+      { label:'A', text:'Gerund phrase' },
+      { label:'B', text:'Infinitive phrase used as direct object' },
+      { label:'C', text:'Prepositional phrase' },
+      { label:'D', text:'Participial phrase' },
+    ],
+    correct: 1,
+    explanation: '"To become a marine biologist" begins with "to" + verb — an infinitive phrase functioning as the direct object of "wanted."'
+  },
+  {
+    text: `<span class="phrase-mark">Barking loudly at the stranger</span>, the dog frightened the mail carrier.`,
+    choices: [
+      { label:'A', text:'Gerund phrase used as subject' },
+      { label:'B', text:'Infinitive phrase' },
+      { label:'C', text:'Participial phrase modifying "dog"' },
+      { label:'D', text:'Absolute phrase' },
+    ],
+    correct: 2,
+    explanation: '"Barking loudly at the stranger" uses a present participle to modify "dog" — a participial phrase.'
+  },
+  {
+    text: `<span class="phrase-mark">The old lighthouse at the edge of the cliff</span> had not been maintained in decades.`,
+    choices: [
+      { label:'A', text:'Gerund phrase' },
+      { label:'B', text:'Verb phrase' },
+      { label:'C', text:'Noun phrase (complete subject)' },
+      { label:'D', text:'Prepositional phrase' },
+    ],
+    correct: 2,
+    explanation: '"The old lighthouse at the edge of the cliff" is a noun phrase — a noun with all its modifiers — functioning as the complete subject.'
+  },
+  {
+    text: `The team <span class="phrase-mark">had been practicing</span> for the regional championship all month.`,
+    choices: [
+      { label:'A', text:'Participial phrase' },
+      { label:'B', text:'Gerund phrase' },
+      { label:'C', text:'Verb phrase (past perfect progressive)' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 2,
+    explanation: '"Had been practicing" is a multi-word verb phrase showing past perfect progressive tense.'
+  },
+
+  // ── MEDIUM (7–14) ─────────────────────────────────────────
+  {
+    text: `<span class="phrase-mark">Exhausted by the long journey</span>, the travelers collapsed into their beds.`,
+    choices: [
+      { label:'A', text:'Gerund phrase used as subject' },
+      { label:'B', text:'Participial phrase (past participle) modifying "travelers"' },
+      { label:'C', text:'Absolute phrase' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 1,
+    explanation: '"Exhausted by the long journey" uses a past participle to modify "travelers" — a participial phrase.'
+  },
+  {
+    text: `His greatest ambition was <span class="phrase-mark">to climb Mount Everest before turning forty</span>.`,
+    choices: [
+      { label:'A', text:'Infinitive phrase used as predicate nominative' },
+      { label:'B', text:'Gerund phrase' },
+      { label:'C', text:'Participial phrase' },
+      { label:'D', text:'Prepositional phrase' },
+    ],
+    correct: 0,
+    explanation: '"To climb Mount Everest before turning forty" is an infinitive phrase following the linking verb "was" — it acts as a predicate nominative (subject complement).'
+  },
+  {
+    text: `She spent the summer <span class="phrase-mark">volunteering at a local food bank</span>.`,
+    choices: [
+      { label:'A', text:'Participial phrase modifying "she"' },
+      { label:'B', text:'Gerund phrase used as object of "spent"' },
+      { label:'C', text:'Infinitive phrase' },
+      { label:'D', text:'Absolute phrase' },
+    ],
+    correct: 1,
+    explanation: '"Volunteering at a local food bank" functions as a gerund phrase — the object of the preposition implied after "spent."'
+  },
+  {
+    text: `<span class="phrase-mark">The letter written in haste</span> contained several embarrassing errors.`,
+    choices: [
+      { label:'A', text:'Absolute phrase' },
+      { label:'B', text:'Gerund phrase used as subject' },
+      { label:'C', text:'Noun phrase with an embedded participial phrase' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 2,
+    explanation: '"The letter written in haste" is a noun phrase — its head noun "letter" is modified by the participial phrase "written in haste."'
+  },
+  {
+    text: `The professor gave us many opportunities <span class="phrase-mark">to revise our work</span>.`,
+    choices: [
+      { label:'A', text:'Infinitive phrase used as adjective modifying "opportunities"' },
+      { label:'B', text:'Infinitive phrase used as adverb modifying "gave"' },
+      { label:'C', text:'Gerund phrase' },
+      { label:'D', text:'Participial phrase' },
+    ],
+    correct: 0,
+    explanation: '"To revise our work" modifies the noun "opportunities" — an infinitive phrase functioning as an adjective.'
+  },
+  {
+    text: `The hikers stopped <span class="phrase-mark">to rest beside the waterfall</span>.`,
+    choices: [
+      { label:'A', text:'Infinitive phrase used as adjective' },
+      { label:'B', text:'Infinitive phrase used as adverb (expressing purpose)' },
+      { label:'C', text:'Gerund phrase' },
+      { label:'D', text:'Prepositional phrase' },
+    ],
+    correct: 1,
+    explanation: '"To rest beside the waterfall" explains why they stopped — an infinitive phrase used as an adverb expressing purpose.'
+  },
+  {
+    text: `<span class="phrase-mark">Her hands trembling with anticipation</span>, she slowly opened the envelope.`,
+    choices: [
+      { label:'A', text:'Participial phrase modifying "she"' },
+      { label:'B', text:'Gerund phrase' },
+      { label:'C', text:'Absolute phrase (nominative absolute)' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 2,
+    explanation: '"Her hands trembling with anticipation" has its own subject ("hands") separate from the main clause subject ("she") — the defining feature of an absolute phrase.'
+  },
+  {
+    text: `<span class="phrase-mark">Swimming competitively at the national level</span> requires unwavering discipline.`,
+    choices: [
+      { label:'A', text:'Participial phrase modifying an implied subject' },
+      { label:'B', text:'Gerund phrase functioning as the sentence subject' },
+      { label:'C', text:'Infinitive phrase' },
+      { label:'D', text:'Noun phrase' },
+    ],
+    correct: 1,
+    explanation: '"Swimming competitively at the national level" is a gerund phrase (gerund + modifiers) acting as the subject of the verb "requires."'
+  },
+
+  // ── HARD (15–20) ──────────────────────────────────────────
+  {
+    text: `<span class="phrase-mark">Having submitted the grant proposal weeks ahead of schedule</span>, the research team felt cautiously optimistic.`,
+    choices: [
+      { label:'A', text:'Absolute phrase' },
+      { label:'B', text:'Gerund phrase used as subject' },
+      { label:'C', text:'Perfect participial phrase modifying "research team"' },
+      { label:'D', text:'Infinitive phrase' },
+    ],
+    correct: 2,
+    explanation: '"Having submitted..." uses a perfect participle (having + past participle) to modify "research team" — a perfect participial phrase showing that this action was completed before the main action.'
+  },
+  {
+    text: `The only solution <span class="phrase-mark">likely to satisfy all parties involved</span> was a complete restructuring.`,
+    choices: [
+      { label:'A', text:'Gerund phrase' },
+      { label:'B', text:'Absolute phrase' },
+      { label:'C', text:'Infinitive phrase functioning as adjective modifying "solution"' },
+      { label:'D', text:'Participial phrase modifying "parties"' },
+    ],
+    correct: 2,
+    explanation: '"Likely to satisfy all parties involved" modifies "solution" — an infinitive phrase (with "to satisfy") functioning as an adjective. "Likely" modifies the whole phrase.'
+  },
+  {
+    text: `<span class="phrase-mark">The crisis having passed and calm restored</span>, the governor lifted the state of emergency.`,
+    choices: [
+      { label:'A', text:'Compound participial phrase modifying "governor"' },
+      { label:'B', text:'Compound absolute phrase' },
+      { label:'C', text:'Gerund phrase used as subject' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 1,
+    explanation: 'This is a compound absolute phrase: "the crisis having passed" and "calm restored" each have their own subjects separate from "the governor," joined by "and."'
+  },
+  {
+    text: `What he feared most was <span class="phrase-mark">being forgotten by those he had loved</span>.`,
+    choices: [
+      { label:'A', text:'Participial phrase modifying "he"' },
+      { label:'B', text:'Infinitive phrase' },
+      { label:'C', text:'Absolute phrase' },
+      { label:'D', text:'Gerund phrase functioning as predicate nominative' },
+    ],
+    correct: 3,
+    explanation: '"Being forgotten by those he had loved" is a gerund phrase following the linking verb "was" — it renames what "he feared most," acting as a predicate nominative.'
+  },
+  {
+    text: `The senator paused, <span class="phrase-mark">visibly shaken by the question and momentarily at a loss for words</span>.`,
+    choices: [
+      { label:'A', text:'Absolute phrase' },
+      { label:'B', text:'Compound participial phrase modifying "senator"' },
+      { label:'C', text:'Gerund phrase' },
+      { label:'D', text:'Compound predicate adjective' },
+    ],
+    correct: 1,
+    explanation: '"Visibly shaken by the question" (participial) and "momentarily at a loss for words" (prepositional functioning as predicate adjective) together form a compound participial phrase modifying "senator."'
+  },
+  {
+    text: `<span class="phrase-mark">To have spoken with such candor before such a hostile audience</span> required extraordinary courage.`,
+    choices: [
+      { label:'A', text:'Perfect gerund phrase' },
+      { label:'B', text:'Participial phrase modifying "courage"' },
+      { label:'C', text:'Perfect infinitive phrase functioning as subject' },
+      { label:'D', text:'Absolute phrase' },
+    ],
+    correct: 2,
+    explanation: '"To have spoken..." uses a perfect infinitive (to have + past participle) — it refers to a completed action and functions as the subject of "required." This is a perfect infinitive phrase.'
+  },
+
+];
+
+GG.initStudentWidget();
+GG.runWorksheet({
+  worksheetId: 'phrases',
+  questions: QUESTIONS,
+  pointsEach: 0.5,
+  onComplete: null,
+});
+</script>
+</body>
+</html>
