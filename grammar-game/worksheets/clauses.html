@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clauses & Sentence Types — Grammar Quest</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Grammar Quest</h1>
+  <nav>
+    <a href="../index.html">← Home</a>
+    <a href="../leaderboard.html">🏆 Leaderboard</a>
+  </nav>
+</header>
+<div class="scoreboard-bar" id="scoreboard-bar"></div>
+
+<div class="page">
+  <div class="worksheet-header">
+    <span class="badge">Worksheet 4</span>
+    <h2>Clauses &amp; Types of Sentences</h2>
+    <p class="subtitle">Identify clauses and classify sentences by their structure.</p>
+    <div class="meta">
+      <span>📝 20 Questions</span>
+      <span>⭐ 10 Points Possible</span>
+      <span>🕐 ~25 minutes</span>
+    </div>
+  </div>
+
+  <div class="student-id-section" id="student-id-section"></div>
+
+  <div class="instructions">
+    <strong>Directions:</strong> Some questions ask you to identify the <strong>type of clause</strong> marked in the sentence (independent, subordinate/adverb, noun, or adjective/relative clause). Others ask you to identify the <strong>type of sentence</strong> overall: <strong>simple</strong> (one independent clause), <strong>compound</strong> (two+ independent clauses joined by FANBOYS or semicolon), <strong>complex</strong> (one independent + one+ subordinate clause), or <strong>compound-complex</strong> (two+ independent + one+ subordinate clause). Read the whole sentence before answering!
+  </div>
+
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text">0 of 20 answered</div>
+
+  <div id="questions-container"></div>
+
+  <div style="margin-top:28px">
+    <button class="submit-btn" id="submit-btn" disabled>Submit Worksheet</button>
+  </div>
+  <div class="results-panel" id="results-panel"></div>
+</div>
+
+<script src="../js/core.js"></script>
+<script>
+
+const QUESTIONS = [
+
+  // ── EASY (1–6) ────────────────────────────────────────────
+  {
+    text: `The rain fell steadily, and the streets flooded quickly. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 1,
+    explanation: 'Two independent clauses joined by the coordinating conjunction "and" — a compound sentence.'
+  },
+  {
+    text: `Because she studied every night, she aced the final exam. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 2,
+    explanation: 'One subordinate clause ("Because she studied every night") + one independent clause = complex sentence.'
+  },
+  {
+    text: `The mountain climbers reached the summit after weeks of preparation. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 0,
+    explanation: 'One subject ("mountain climbers"), one predicate ("reached"), no subordinate clauses — a simple sentence. The prepositional phrase is not a clause.'
+  },
+  {
+    text: `Identify the clause type: <mark>Because the power went out</mark>, the entire neighborhood was plunged into darkness.`,
+    choices: [
+      { label:'A', text:'Independent clause' },
+      { label:'B', text:'Noun clause (subject)' },
+      { label:'C', text:'Adverb clause (subordinate)' },
+      { label:'D', text:'Adjective (relative) clause' },
+    ],
+    correct: 2,
+    explanation: '"Because the power went out" begins with a subordinating conjunction and tells why the neighborhood went dark — an adverb clause.'
+  },
+  {
+    text: `The book <mark>that she recommended</mark> was out of stock at every bookstore in town.`,
+    choices: [
+      { label:'A', text:'Independent clause' },
+      { label:'B', text:'Adverb clause' },
+      { label:'C', text:'Noun clause' },
+      { label:'D', text:'Adjective (relative) clause modifying "book"' },
+    ],
+    correct: 3,
+    explanation: '"That she recommended" introduces a relative pronoun and modifies the noun "book" — an adjective (relative) clause.'
+  },
+  {
+    text: `I believe <mark>that honesty is the best policy</mark>.`,
+    choices: [
+      { label:'A', text:'Adjective clause modifying "I"' },
+      { label:'B', text:'Adverb clause modifying "believe"' },
+      { label:'C', text:'Noun clause functioning as direct object' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"That honesty is the best policy" is the object of "believe" — a noun clause functioning as a direct object.'
+  },
+
+  // ── MEDIUM (7–14) ─────────────────────────────────────────
+  {
+    text: `She finished her report, but she realized she had forgotten the citations. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence with compound predicate' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 3,
+    explanation: 'Two independent clauses ("She finished her report" and "she realized...") plus a subordinate noun clause ("she had forgotten the citations") = compound-complex.'
+  },
+  {
+    text: `<mark>Whoever submits the best proposal</mark> will receive the grant funding.`,
+    choices: [
+      { label:'A', text:'Adverb clause' },
+      { label:'B', text:'Adjective clause' },
+      { label:'C', text:'Noun clause functioning as subject' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"Whoever submits the best proposal" contains a subject and verb and functions as the subject of the main verb "will receive" — a noun clause.'
+  },
+  {
+    text: `The student who earned the highest grade on the test also won a scholarship. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 2,
+    explanation: 'One independent clause containing an embedded adjective clause ("who earned the highest grade on the test") = complex sentence.'
+  },
+  {
+    text: `The committee announced <mark>where the new facility would be built</mark>.`,
+    choices: [
+      { label:'A', text:'Adjective clause modifying "committee"' },
+      { label:'B', text:'Adverb clause modifying "announced"' },
+      { label:'C', text:'Noun clause functioning as direct object' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"Where the new facility would be built" answers what the committee announced — a noun clause as direct object.'
+  },
+  {
+    text: `The artist painted a mural <mark>that stretched across three city blocks</mark> and depicted the town\'s history.`,
+    choices: [
+      { label:'A', text:'Adverb clause' },
+      { label:'B', text:'Noun clause' },
+      { label:'C', text:'Restrictive adjective clause modifying "mural"' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"That stretched across three city blocks" modifies "mural" and limits which mural we mean — a restrictive adjective clause.'
+  },
+  {
+    text: `Although the weather was dreadful, the outdoor concert proceeded as planned, and the crowd enjoyed every moment. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Compound sentence' },
+      { label:'B', text:'Complex sentence' },
+      { label:'C', text:'Simple sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 3,
+    explanation: 'Two independent clauses ("the outdoor concert proceeded..." and "the crowd enjoyed...") + one subordinate adverb clause ("Although the weather was dreadful") = compound-complex.'
+  },
+  {
+    text: `<mark>Provided that all members agree</mark>, the vote will be final and binding.`,
+    choices: [
+      { label:'A', text:'Noun clause (subject)' },
+      { label:'B', text:'Adjective clause modifying "members"' },
+      { label:'C', text:'Independent clause' },
+      { label:'D', text:'Adverb clause of condition' },
+    ],
+    correct: 3,
+    explanation: '"Provided that all members agree" is introduced by the complex subordinating conjunction "provided that" and states a condition — an adverb clause of condition.'
+  },
+  {
+    text: `The discovery that the vaccine was highly effective changed the course of the epidemic. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Simple sentence' },
+      { label:'B', text:'Compound sentence' },
+      { label:'C', text:'Complex sentence' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 2,
+    explanation: 'One independent clause with an embedded noun clause ("that the vaccine was highly effective") in apposition to "discovery." One dependent + one independent = complex.'
+  },
+
+  // ── HARD (15–20) ──────────────────────────────────────────
+  {
+    text: `<mark>What the investigators found</mark> contradicted everything that the suspect had claimed.`,
+    choices: [
+      { label:'A', text:'Adjective clause modifying "investigators"' },
+      { label:'B', text:'Noun clause functioning as the sentence subject' },
+      { label:'C', text:'Adverb clause of comparison' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 1,
+    explanation: '"What the investigators found" is the subject of "contradicted" — a noun clause functioning as subject. The sentence also contains an adjective clause ("that the suspect had claimed").'
+  },
+  {
+    text: `The city <mark>whose infrastructure had been neglected for decades</mark> finally received emergency federal funding.`,
+    choices: [
+      { label:'A', text:'Noun clause (direct object)' },
+      { label:'B', text:'Adverb clause of cause' },
+      { label:'C', text:'Adjective (relative) clause using possessive relative pronoun "whose"' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"Whose infrastructure had been neglected for decades" uses the relative pronoun "whose" to show possession and modifies "city" — a relative (adjective) clause.'
+  },
+  {
+    text: `The reason <mark>why she refused the promotion</mark> remained a mystery to her colleagues.`,
+    choices: [
+      { label:'A', text:'Adverb clause modifying "remained"' },
+      { label:'B', text:'Noun clause (subject)' },
+      { label:'C', text:'Adjective clause modifying "reason"' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 2,
+    explanation: '"Why she refused the promotion" is introduced by the relative adverb "why" and modifies the noun "reason" — an adjective clause.'
+  },
+  {
+    text: `She trained rigorously so <mark>that she would be ready</mark> when the opportunity arose. <br><em>What type of sentence is this, and what is the function of the marked clause?</em>`,
+    choices: [
+      { label:'A', text:'Complex; marked clause is an adjective clause' },
+      { label:'B', text:'Complex; marked clause is an adverb clause of purpose' },
+      { label:'C', text:'Compound-complex; marked clause is an adverb clause of purpose' },
+      { label:'D', text:'Compound; marked clause is an independent clause' },
+    ],
+    correct: 2,
+    explanation: 'The sentence has one independent clause ("She trained rigorously") and two subordinate clauses: "so that she would be ready" (adverb of purpose) and "when the opportunity arose" (adverb of time) = complex. The marked clause expresses purpose.'
+  },
+  {
+    text: `<mark>Whichever decision the board makes</mark>, it must align with the company's long-term values and mission.`,
+    choices: [
+      { label:'A', text:'Adjective clause modifying "board"' },
+      { label:'B', text:'Adverb clause of condition using an indefinite relative pronoun' },
+      { label:'C', text:'Noun clause used as subject' },
+      { label:'D', text:'Independent clause' },
+    ],
+    correct: 1,
+    explanation: '"Whichever decision the board makes" is a concessive/conditional adverb clause — it sets an open condition regardless of which choice is made. The sentence is complex.'
+  },
+  {
+    text: `The historian argued that the causes of the war were economic, yet she acknowledged that nationalism played an equally decisive role. <br><em>What type of sentence is this?</em>`,
+    choices: [
+      { label:'A', text:'Compound sentence' },
+      { label:'B', text:'Complex sentence' },
+      { label:'C', text:'Simple sentence with compound predicate' },
+      { label:'D', text:'Compound-complex sentence' },
+    ],
+    correct: 3,
+    explanation: 'Two independent clauses joined by "yet" + two embedded noun clauses ("that the causes were economic" and "that nationalism played...") = compound-complex.'
+  },
+
+];
+
+GG.initStudentWidget();
+GG.runWorksheet({
+  worksheetId: 'clauses',
+  questions: QUESTIONS,
+  pointsEach: 0.5,
+  onComplete: null,
+});
+</script>
+</body>
+</html>

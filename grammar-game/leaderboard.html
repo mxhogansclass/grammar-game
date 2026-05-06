@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard — Grammar Quest</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
+    margin: 36px 0 40px;
+    padding: 0 10px;
+  }
+  .podium-block {
+    text-align: center;
+    flex: 1;
+    max-width: 180px;
+    border-radius: 6px 6px 0 0;
+    padding: 16px 10px 12px;
+    font-family: 'Playfair Display', serif;
+    transition: transform 0.2s;
+  }
+  .podium-block:hover { transform: translateY(-4px); }
+  .podium-1 { background: var(--gold); color: var(--ink); height: 160px; order: 2; }
+  .podium-2 { background: #b0b8c1; color: var(--ink); height: 120px; order: 1; }
+  .podium-3 { background: #c49a6c; color: #fff; height: 100px; order: 3; }
+  .podium-label { font-size: 1.8rem; font-weight: 900; }
+  .podium-pts { font-size: 1.1rem; margin-top: 4px; }
+  .podium-rank { font-size: 2rem; }
+  .trophy { font-size: 2.2rem; display: block; margin-bottom: 4px; }
+
+  .block-bar-wrap {
+    background: var(--cream);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .block-bar-item {
+    margin-bottom: 18px;
+  }
+  .block-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+  }
+  .block-bar-track {
+    height: 24px;
+    background: #e0d8c8;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .block-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+  .bar-A { background: linear-gradient(90deg, #1a3a5c, #3a6fa8); }
+  .bar-D { background: linear-gradient(90deg, #1a5c2e, #3aaa6e); }
+  .bar-F { background: linear-gradient(90deg, #8b2020, #d04040); }
+
+  .note-box {
+    background: #fff8e8;
+    border: 1.5px dashed var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .last-updated {
+    font-size: 0.78rem;
+    color: #999;
+    text-align: right;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Grammar Quest</h1>
+  <nav>
+    <a href="index.html">← Home</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+    <a href="teacher.html">Teacher Dashboard</a>
+  </nav>
+</header>
+<div class="scoreboard-bar" id="scoreboard-bar"></div>
+
+<div class="page">
+
+  <div class="worksheet-header">
+    <span class="badge">Live Standings</span>
+    <h2>🏆 Class Leaderboard</h2>
+    <p class="subtitle">Which block will claim the semester prize?</p>
+  </div>
+
+  <div class="note-box">
+    <strong>Note:</strong> These standings reflect scores entered on <em>this device/browser</em>. In a shared classroom setting, your teacher will consolidate scores from all students into the official totals. Points update in real time as worksheets are submitted on this device.
+  </div>
+
+  <!-- Podium -->
+  <div id="podium" class="podium"></div>
+
+  <!-- Bar chart -->
+  <div class="block-bar-wrap">
+    <h3 style="font-family:'Playfair Display',serif;margin-bottom:20px">Points by Block</h3>
+    <div id="bars"></div>
+    <div class="last-updated" id="last-updated"></div>
+  </div>
+
+  <!-- Worksheet completion breakdown -->
+  <div class="worksheet-header" style="margin-top:0">
+    <h2 style="font-size:1.4rem">Worksheet Completion on This Device</h2>
+  </div>
+  <table class="leaderboard-table" id="completion-table">
+    <thead>
+      <tr>
+        <th>Worksheet</th>
+        <th>Max Points</th>
+        <th>Your Score</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="completion-body"></tbody>
+  </table>
+
+</div>
+
+<script src="js/core.js"></script>
+<script>
+  GG.renderScoreboardBar();
+
+  const WORKSHEETS = [
+    { id: 'parts-of-speech',   label: 'Parts of Speech',             max: 10 },
+    { id: 'parts-of-sentence', label: 'Parts of a Sentence',         max: 10 },
+    { id: 'phrases',           label: 'Phrases',                     max: 10 },
+    { id: 'clauses',           label: 'Clauses & Sentence Types',    max: 10 },
+    { id: 'cumulative',        label: 'The Grand Challenge',         max: 30 },
+  ];
+
+  function renderPodium(totals) {
+    const sorted = Object.entries(totals)
+      .sort((a,b) => b[1]-a[1])
+      .map(([block, pts], i) => ({ block, pts, rank: i+1 }));
+
+    const colors   = ['podium-1','podium-2','podium-3'];
+    const trophies = ['🥇','🥈','🥉'];
+    const podium   = document.getElementById('podium');
+
+    podium.innerHTML = sorted.map((s,i) => `
+      <div class="podium-block ${colors[i]}">
+        <span class="trophy">${trophies[i]}</span>
+        <div class="podium-rank">Block ${s.block}</div>
+        <div class="podium-pts">${s.pts} pts</div>
+      </div>
+    `).join('');
+  }
+
+  function renderBars(totals) {
+    const max = Math.max(...Object.values(totals), 1);
+    const barsDiv = document.getElementById('bars');
+    barsDiv.innerHTML = ['A','D','F'].map(b => `
+      <div class="block-bar-item">
+        <div class="block-bar-label">
+          <span>Block ${b}</span>
+          <span>${totals[b]} pts</span>
+        </div>
+        <div class="block-bar-track">
+          <div class="block-bar-fill bar-${b}" style="width:${(totals[b]/max*100).toFixed(1)}%"></div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  }
+
+  function renderCompletion() {
+    const scores = GG.getScores();
+    const tbody  = document.getElementById('completion-body');
+    tbody.innerHTML = WORKSHEETS.map(ws => {
+      const sc = scores[ws.id];
+      return `<tr>
+        <td>${ws.label}</td>
+        <td>${ws.max}</td>
+        <td>${sc ? sc.points : '—'}</td>
+        <td>${sc ? '<span style="color:var(--correct);font-weight:600">✓ Done</span>' : '<span style="color:#aaa">Not started</span>'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const totals = GG.getBlockTotals();
+  renderPodium(totals);
+  renderBars(totals);
+  renderCompletion();
+
+  // Auto-refresh every 30s
+  setInterval(() => {
+    const t = GG.getBlockTotals();
+    renderPodium(t);
+    renderBars(t);
+    renderCompletion();
+    GG.renderScoreboardBar();
+  }, 30000);
+</script>
+</body>
+</html>
