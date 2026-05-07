@@ -70,7 +70,7 @@ const GG = (() => {
 
   // ── Google Sheets: submit score ──────────────
   function submitToSheet(student, worksheetId, points) {
-    if (!student || !SHEET_URL || SHEET_URL.includes('https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec')) return;
+    if (!student || !SHEET_URL || SHEET_URL.includes('YOUR_URL_HERE')) return;
     fetch(SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
