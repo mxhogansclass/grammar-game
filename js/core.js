@@ -30,6 +30,7 @@ const GG = (() => {
 
   // ── Worksheet scores ─────────────────────────
   //  scores = { worksheetId: { points, total, completedAt } }
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxsqP5wKr6L70spvtmxFZZO52uMIW9eEVPwLbJviIK_kWAkpcoPD5yarPRN4aQnIYCPHA/exec';
   function getScores() { return load('scores', {}); }
   function saveScore(worksheetId, points, total) {
     const scores = getScores();
@@ -47,12 +48,7 @@ const GG = (() => {
   // ── Block leaderboard (shared via localStorage across same browser — 
   //    real multi-student sharing done via teacher dashboard export) ──────
   // Each student's record is keyed by block+name
-  function submitToLeaderboard(student, points) {
-    const board = load('leaderboard', {});
-    const key = `${student.block}__${student.name}`;
-    board[key] = { block: student.block, name: student.name, points, ts: Date.now() };
-    save('leaderboard', board);
-  }
+     save('leaderboard', board);
   function getLeaderboard() {
     return load('leaderboard', {});
   }
@@ -225,6 +221,7 @@ const GG = (() => {
 
         saveScore(worksheetId, points, total);
         submitToLeaderboard(student, getTotalPoints());
+        submitToSheet(student, worksheetId, points);
         renderScoreboardBar();
 
         if (resultsPanel) {
