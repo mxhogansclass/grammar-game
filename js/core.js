@@ -1,9 +1,14 @@
 // ═══════════════════════════════════════════════
 //  grammar-game/js/core.js
 //  Shared logic: student identity, storage, scoring
+//  Includes Google Sheets integration
 // ═══════════════════════════════════════════════
 
 const GG = (() => {
+
+  // ── Paste your Apps Script URL here ──────────
+  const SHEET_URL = 'https://script.google.com/macros/s/YOUR_URL_HERE/exec';
+  const SECRET    = 'yourSecretWord2025'; // match this in Apps Script
 
   // ── Storage helpers ──────────────────────────
   const PREFIX = 'gg_';
@@ -29,12 +34,9 @@ const GG = (() => {
   }
 
   // ── Worksheet scores ─────────────────────────
-  //  scores = { worksheetId: { points, total, completedAt } }
-  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxsqP5wKr6L70spvtmxFZZO52uMIW9eEVPwLbJviIK_kWAkpcoPD5yarPRN4aQnIYCPHA/exec';
   function getScores() { return load('scores', {}); }
   function saveScore(worksheetId, points, total) {
     const scores = getScores();
-    // Only overwrite if higher (allow improvement)
     if (!scores[worksheetId] || points > scores[worksheetId].points) {
       scores[worksheetId] = { points, total, completedAt: Date.now() };
       save('scores', scores);
@@ -45,15 +47,18 @@ const GG = (() => {
     return Object.values(getScores()).reduce((sum, s) => sum + s.points, 0);
   }
 
-  // ── Block leaderboard (shared via localStorage across same browser — 
-  //    real multi-student sharing done via teacher dashboard export) ──────
-  // Each student's record is keyed by block+name
-     save('leaderboard', board);
+  // ── Local leaderboard ────────────────────────
+  function submitToLeaderboard(student, points) {
+    const board = load('leaderboard', {});
+    const key = `${student.block}__${student.name}`;
+    board[key] = { block: student.block, name: student.name, points, ts: Date.now() };
+    save('leaderboard', board);
+  }
   function getLeaderboard() {
     return load('leaderboard', {});
   }
 
-  // ── Block totals ─────────────────────────────
+  // ── Local block totals ───────────────────────
   function getBlockTotals() {
     const board = getLeaderboard();
     const totals = { A: 0, D: 0, F: 0 };
@@ -61,6 +66,37 @@ const GG = (() => {
       if (totals[r.block] !== undefined) totals[r.block] += r.points;
     });
     return totals;
+  }
+
+  // ── Google Sheets: submit score ──────────────
+  function submitToSheet(student, worksheetId, points) {
+    if (!student || !SHEET_URL || SHEET_URL.includes('YOUR_URL_HERE')) return;
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret:    SECRET,
+        name:      student.name,
+        block:     student.block,
+        worksheet: worksheetId,
+        points:    points,
+        total:     getTotalPoints()
+      })
+    }).catch(() => {});
+  }
+
+  // ── Google Sheets: fetch live totals ─────────
+  async function fetchLiveTotals() {
+    if (!SHEET_URL || SHEET_URL.includes('https://script.google.com/macros/s/AKfycbw2OsReJmHE5sjbrzVUTb4BfgFd4xQTDeR9t858Xs5WA1Tc54Zahz5BDnOAiVTd8C94EA/exec')) {
+      return getBlockTotals();
+    }
+    try {
+      const res  = await fetch(SHEET_URL + '?t=' + Date.now());
+      const data = await res.json();
+      if (data.success) return data.totals;
+    } catch(e) {}
+    return getBlockTotals();
   }
 
   // ── Scoreboard bar renderer ───────────────────
@@ -79,7 +115,7 @@ const GG = (() => {
     `;
   }
 
-  // ── Init student ID widgets on worksheet pages ─
+  // ── Init student ID widget ────────────────────
   function initStudentWidget(onReady) {
     const wrap = document.getElementById('student-id-section');
     if (!wrap) { onReady && onReady(getStudent()); return; }
@@ -128,11 +164,9 @@ const GG = (() => {
   }
 
   // ── Worksheet runner ─────────────────────────
-  //  questions: array of { text, choices:[{label,text}], correct (index), explanation }
-  //  pointsEach: points per correct answer
   function runWorksheet({ worksheetId, questions, pointsEach, onComplete }) {
     let student = getStudent();
-    let answers = new Array(questions.length).fill(null); // null | index chosen
+    let answers = new Array(questions.length).fill(null);
     let locked  = new Array(questions.length).fill(false);
 
     const progressFill = document.getElementById('progress-fill');
@@ -140,7 +174,6 @@ const GG = (() => {
     const submitBtn    = document.getElementById('submit-btn');
     const resultsPanel = document.getElementById('results-panel');
 
-    // Render all questions
     const container = document.getElementById('questions-container');
     container.innerHTML = '';
 
@@ -164,7 +197,6 @@ const GG = (() => {
       container.appendChild(block);
     });
 
-    // Choice click handler
     container.addEventListener('click', e => {
       const btn = e.target.closest('.choice-btn');
       if (!btn) return;
@@ -176,11 +208,10 @@ const GG = (() => {
       answers[qi] = ci;
 
       const choicesDiv = document.getElementById(`choices-${qi}`);
-      const qBlock = document.getElementById(`q-${qi}`);
-      const fbDiv  = document.getElementById(`fb-${qi}`);
-      const isCorrect = ci === questions[qi].correct;
+      const qBlock     = document.getElementById(`q-${qi}`);
+      const fbDiv      = document.getElementById(`fb-${qi}`);
+      const isCorrect  = ci === questions[qi].correct;
 
-      // Style all choices
       choicesDiv.querySelectorAll('.choice-btn').forEach((b,i) => {
         b.disabled = true;
         if (i === questions[qi].correct) b.classList.add('correct');
@@ -190,7 +221,6 @@ const GG = (() => {
 
       qBlock.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
 
-      // Feedback
       fbDiv.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
       fbDiv.innerHTML = (isCorrect ? '✓ Correct! ' : '✗ Not quite. ') + (questions[qi].explanation || '');
 
@@ -212,16 +242,16 @@ const GG = (() => {
         if (locked.some(l => !l)) {
           alert('Please answer all questions before submitting.'); return;
         }
-        const correct = answers.filter((a,i) => a === questions[i].correct).length;
-        const points  = correct * pointsEach;
-        const total   = questions.length * pointsEach;
 
-        // Re-read student in case they saved after page load
+        const correct = answers.filter((a,i) => a === questions[i].correct).length;
+        const points  = Math.round(correct * pointsEach * 10) / 10;
+        const total   = Math.round(questions.length * pointsEach * 10) / 10;
+
         student = getStudent() || { block: '?', name: 'Anonymous' };
 
         saveScore(worksheetId, points, total);
         submitToLeaderboard(student, getTotalPoints());
-        submitToSheet(student, worksheetId, points);
+        submitToSheet(student, worksheetId, points); // ← sends to Google Sheets
         renderScoreboardBar();
 
         if (resultsPanel) {
@@ -254,8 +284,15 @@ const GG = (() => {
     return { leaderboard: board, scores, exportedAt: new Date().toISOString() };
   }
 
-  return { save, load, getStudent, setStudent, getScores, saveScore,
-           getTotalPoints, submitToLeaderboard, getLeaderboard,
-           getBlockTotals, renderScoreboardBar, initStudentWidget,
-           runWorksheet, exportData };
+  return {
+    save, load,
+    getStudent, setStudent,
+    getScores, saveScore, getTotalPoints,
+    submitToLeaderboard, getLeaderboard,
+    getBlockTotals, fetchLiveTotals,
+    renderScoreboardBar,
+    initStudentWidget, runWorksheet,
+    exportData
+  };
+
 })();
