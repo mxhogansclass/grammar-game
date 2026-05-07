@@ -196,31 +196,20 @@
     }).join('');
   }
 
-  const totals = GG.getBlockTotals();
-  renderPodium(totals);
-  renderBars(totals);
-  renderCompletion();
+  // ── Load live totals from Google Sheet ──
+  function loadAndRender() {
+    GG.fetchLiveTotals().then(totals => {
+      renderPodium(totals);
+      renderBars(totals);
+    });
+    renderCompletion();
+  }
 
-  // Auto-refresh every 30s
-  setInterval(() => {
-    const t = GG.getBlockTotals();
-   // Try live Google Sheet first, fall back to localStorage
-GG.fetchLiveTotals().then(totals => {
-  renderPodium(totals);
-  renderBars(totals);
-});
-renderCompletion();
+  // Run on page load
+  loadAndRender();
 
-// Auto-refresh every 60 seconds
-setInterval(() => {
-  GG.fetchLiveTotals().then(totals => {
-    renderPodium(totals);
-    renderBars(totals);
-    GG.renderScoreboardBar();
-  });
-}, 60000);
-    GG.renderScoreboardBar();
-  }, 30000);
+  // Auto-refresh every 30 seconds
+  setInterval(loadAndRender, 30000);
 </script>
 </body>
 </html>
