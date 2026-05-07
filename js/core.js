@@ -6,9 +6,8 @@
 
 const GG = (() => {
 
-  // ── Paste your Apps Script URL here ──────────
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec';
-  const SECRET    = 'cricket26'; // match this in Apps Script
+  const SECRET    = 'cricket26';
 
   // ── Storage helpers ──────────────────────────
   const PREFIX = 'gg_';
@@ -69,33 +68,30 @@ const GG = (() => {
   }
 
   // ── Google Sheets: submit score ──────────────
+  // Uses image GET trick to avoid CORS issues
   function submitToSheet(student, worksheetId, points) {
-    if (!student || !SHEET_URL || SHEET_URL.includes('YOUR_URL_HERE')) return;
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        secret:    cricket26,
-        name:      student.name,
-        block:     student.block,
-        worksheet: worksheetId,
-        points:    points,
-        total:     getTotalPoints()
-      })
-    }).catch(() => {});
+    if (!student) return;
+    const params = new URLSearchParams({
+      secret:    SECRET,
+      name:      student.name,
+      block:     student.block,
+      worksheet: worksheetId,
+      points:    points,
+      total:     getTotalPoints()
+    });
+    const img = new Image();
+    img.src = SHEET_URL + '?' + params.toString();
   }
 
   // ── Google Sheets: fetch live totals ─────────
   async function fetchLiveTotals() {
-    if (!SHEET_URL || SHEET_URL.includes('https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec')) {
-      return getBlockTotals();
-    }
     try {
       const res  = await fetch(SHEET_URL + '?t=' + Date.now());
       const data = await res.json();
-      if (data.success) return data.totals;
-    } catch(e) {}
+      if (data.success && data.totals) return data.totals;
+    } catch(e) {
+      console.log('Could not reach sheet, using local totals');
+    }
     return getBlockTotals();
   }
 
@@ -249,9 +245,9 @@ const GG = (() => {
 
         student = getStudent() || { block: '?', name: 'Anonymous' };
 
+        // ── UI and local saves first ──
         saveScore(worksheetId, points, total);
         submitToLeaderboard(student, getTotalPoints());
-        submitToSheet(student, worksheetId, points); // ← sends to Google Sheets
         renderScoreboardBar();
 
         if (resultsPanel) {
@@ -269,6 +265,9 @@ const GG = (() => {
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitted!';
+
+        // ── Send to Google Sheets last ──
+        submitToSheet(student, worksheetId, points);
 
         onComplete && onComplete({ points, total, correct, student });
       });
