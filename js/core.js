@@ -7,8 +7,8 @@
 const GG = (() => {
 
   // ── Paste your Apps Script URL here ──────────
-  const SHEET_URL = 'https://script.google.com/macros/s/YOUR_URL_HERE/exec';
-  const SECRET    = 'yourSecretWord2025'; // match this in Apps Script
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec';
+  const SECRET    = 'cricket26'; // match this in Apps Script
 
   // ── Storage helpers ──────────────────────────
   const PREFIX = 'gg_';
@@ -76,7 +76,7 @@ const GG = (() => {
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        secret:    SECRET,
+        secret:    cricket26,
         name:      student.name,
         block:     student.block,
         worksheet: worksheetId,
@@ -88,7 +88,7 @@ const GG = (() => {
 
   // ── Google Sheets: fetch live totals ─────────
   async function fetchLiveTotals() {
-    if (!SHEET_URL || SHEET_URL.includes('https://script.google.com/macros/s/AKfycbw2OsReJmHE5sjbrzVUTb4BfgFd4xQTDeR9t858Xs5WA1Tc54Zahz5BDnOAiVTd8C94EA/exec')) {
+    if (!SHEET_URL || SHEET_URL.includes('https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec')) {
       return getBlockTotals();
     }
     try {
