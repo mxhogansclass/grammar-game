@@ -204,9 +204,21 @@
   // Auto-refresh every 30s
   setInterval(() => {
     const t = GG.getBlockTotals();
-    renderPodium(t);
-    renderBars(t);
-    renderCompletion();
+   // Try live Google Sheet first, fall back to localStorage
+GG.fetchLiveTotals().then(totals => {
+  renderPodium(totals);
+  renderBars(totals);
+});
+renderCompletion();
+
+// Auto-refresh every 60 seconds
+setInterval(() => {
+  GG.fetchLiveTotals().then(totals => {
+    renderPodium(totals);
+    renderBars(totals);
+    GG.renderScoreboardBar();
+  });
+}, 60000);
     GG.renderScoreboardBar();
   }, 30000);
 </script>
