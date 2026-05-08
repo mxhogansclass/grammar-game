@@ -132,21 +132,6 @@
 </head>
 <body>
 
-<!-- Password check -->
-<script>
-  const PASSWORD = 'cricket26';
-  const entered = sessionStorage.getItem('teacher_auth');
-  if (entered !== PASSWORD) {
-    const attempt = prompt('Enter teacher password:');
-    if (attempt !== PASSWORD) {
-      alert('Incorrect password.');
-      window.location.href = 'index.html';
-    } else {
-      sessionStorage.setItem('teacher_auth', PASSWORD);
-    }
-  }
-</script>
-
 <header class="site-header">
   <h1>Grammar Quest</h1>
   <nav>
@@ -272,4 +257,290 @@
         <tr><td>14</td><td>POS</td><td>C — Transitive action verb</td><td>"medication" = direct object</td></tr>
         <tr><td>15</td><td>POS</td><td>B — Adverb modifying adjective</td><td>"remarkably" → how patient</td></tr>
         <tr><td>16</td><td>POS</td><td>D — Common, abstract noun</td><td>integrity = concept</td></tr>
-        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase</t
+        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase</td><td>has been + studying</td></tr>
+        <tr><td>18</td><td>POS</td><td>C — Collective noun</td><td>jury = group as unit</td></tr>
+        <tr><td>19</td><td>POS</td><td>C — Adverb modifying adjective</td><td>"profoundly" → how unsettling</td></tr>
+        <tr><td>20</td><td>POS</td><td>C — Indefinite relative pronoun</td><td>whichever = no specific antecedent</td></tr>
+        <tr class="ws-section-head"><td colspan="4">PARTS OF A SENTENCE (0.5 pt each)</td></tr>
+        <tr><td>1</td><td>Sentence</td><td>B — Complete subject</td><td>"The old cat" = head + modifiers</td></tr>
+        <tr><td>2</td><td>Sentence</td><td>C — Simple predicate</td><td>"studied" = main verb only</td></tr>
+        <tr><td>3</td><td>Sentence</td><td>C — Indirect object</td><td>"to whom" = her brother</td></tr>
+        <tr><td>4</td><td>Sentence</td><td>D — Part of complete predicate</td><td>prep phrase as adverbial</td></tr>
+        <tr><td>5</td><td>Sentence</td><td>B — Predicate adjective</td><td>"dark" follows linking verb</td></tr>
+        <tr><td>6</td><td>Sentence</td><td>D — Direct object</td><td>"bone" receives buried</td></tr>
+        <tr><td>7</td><td>Sentence</td><td>B — Complete predicate</td><td>verbs + all modifiers/objects</td></tr>
+        <tr><td>8</td><td>Sentence</td><td>B — Direct object</td><td>contestant acted upon</td></tr>
+        <tr><td>9</td><td>Sentence</td><td>C — Object complement</td><td>renames the direct object</td></tr>
+        <tr><td>10</td><td>Sentence</td><td>D — Indirect object</td><td>to whom story was read</td></tr>
+        <tr><td>11</td><td>Sentence</td><td>B — Complete subject (compound)</td><td>two nouns as subject</td></tr>
+        <tr><td>12</td><td>Sentence</td><td>C — Predicate adjective</td><td>follows linking verb "remained"</td></tr>
+        <tr><td>13</td><td>Sentence</td><td>B — Direct object</td><td>Ms. Rivera acted upon by "elected"</td></tr>
+        <tr><td>14</td><td>Sentence</td><td>C — Object complement (adj.)</td><td>describes direct object "conclusion"</td></tr>
+        <tr><td>15</td><td>Sentence</td><td>B — Predicate nominative</td><td>follows "was," renames noun-clause subject</td></tr>
+        <tr><td>16</td><td>Sentence</td><td>D — Direct object</td><td>"her" acted upon by "considered"</td></tr>
+        <tr><td>17</td><td>Sentence</td><td>C — Noun clause as subject</td><td>"Whoever arrives first" = who arrives</td></tr>
+        <tr><td>18</td><td>Sentence</td><td>C — Object complement (compound adj.)</td><td>modifies direct object "design"</td></tr>
+        <tr><td>19</td><td>Sentence</td><td>C — Predicate nominative</td><td>"she" (subject case) after "was"</td></tr>
+        <tr><td>20</td><td>Sentence</td><td>C — Direct object</td><td>"revision process" acted upon by "made"</td></tr>
+        <tr class="ws-section-head"><td colspan="4">PHRASES (0.5 pt each)</td></tr>
+        <tr><td>1-20</td><td>Phrases</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
+        <tr class="ws-section-head"><td colspan="4">CLAUSES &amp; SENTENCE TYPES (0.5 pt each)</td></tr>
+        <tr><td>1-20</td><td>Clauses</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
+        <tr class="ws-section-head"><td colspan="4">CUMULATIVE (1 pt each)</td></tr>
+        <tr><td>1-50</td><td>Cumulative</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="tool-card">
+      <h3>About Deletion</h3>
+      <p>Deleting a row removes it permanently from the Google Sheet. This cannot be undone. Use this if you suspect a score was submitted dishonestly. The student's other scores are not affected.</p>
+    </div>
+    <div class="tool-card">
+      <h3>Change Teacher Password</h3>
+      <p>Find <code>var TEACHER_PW = 'cricket26'</code> in the script at the bottom of <code>teacher.html</code> and change it to whatever you want, then re-upload to GitHub.</p>
+    </div>
+    <div class="tool-card">
+      <h3>Reset Local Device Data</h3>
+      <p>⚠️ This clears localStorage on this device only. Google Sheet data is unaffected.</p>
+      <button class="tool-btn danger" onclick="resetLocal()">🗑️ Clear This Device's Local Data</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Confirm delete overlay -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>⚠️ Delete This Submission?</h3>
+    <p id="confirm-msg">Are you sure?</p>
+    <div class="confirm-btns">
+      <button class="tool-btn danger" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="tool-btn" onclick="cancelDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+
+  // ── Config — change password here ────────────
+  var TEACHER_PW  = 'cricket26';
+  var SHEET_URL   = 'https://script.google.com/macros/s/AKfycbzm6xsCSVPYyD49_Z3oDTQsFrg6R3QiU0GRX_3SPEJvSqZoq7PgJl9pyg9MWX1PneDMrA/exec';
+  var SHEET_SECRET = 'cricket26';
+
+  // ── Password check ────────────────────────────
+  (function() {
+    var entered = sessionStorage.getItem('teacher_auth');
+    if (entered !== TEACHER_PW) {
+      var attempt = prompt('Enter teacher password:');
+      if (attempt !== TEACHER_PW) {
+        alert('Incorrect password.');
+        window.location.href = 'index.html';
+      } else {
+        sessionStorage.setItem('teacher_auth', TEACHER_PW);
+      }
+    }
+  })();
+
+  var allRows = [];
+
+  // ── Tab system ────────────────────────────────
+  function showTab(id) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('onclick').indexOf("'" + id + "'") > -1);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.classList.toggle('active', p.id === 'tab-' + id);
+    });
+    if (id === 'summary') renderSummary();
+  }
+
+  // ── Load data from Google Sheet ───────────────
+  function loadSheetData() {
+    document.getElementById('scores-body').innerHTML =
+      '<tr><td colspan="8" class="loading-msg">🔄 Loading from Google Sheets...</td></tr>';
+    document.getElementById('class-totals-grid').innerHTML =
+      '<div class="loading-msg" style="grid-column:1/-1">Loading live data...</div>';
+
+    fetch(SHEET_URL + '?mode=all&t=' + Date.now())
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success && data.rows) {
+          allRows = data.rows;
+          applyFilters();
+          renderClassTotals(data.totals);
+          renderSummary();
+          document.getElementById('last-refresh').textContent =
+            'Last updated: ' + new Date().toLocaleTimeString();
+        } else {
+          showError('Apps Script returned an error. Check your deployment.');
+        }
+        GG.renderScoreboardBar();
+      })
+      .catch(function(e) {
+        showError('Could not reach Google Sheets: ' + e.message);
+        GG.renderScoreboardBar();
+      });
+  }
+
+  function showError(msg) {
+    document.getElementById('scores-body').innerHTML =
+      '<tr><td colspan="8" class="loading-msg">' + msg + '</td></tr>';
+    document.getElementById('class-totals-grid').innerHTML =
+      '<div class="loading-msg" style="grid-column:1/-1">' + msg + '</div>';
+  }
+
+  // ── Class totals ──────────────────────────────
+  function renderClassTotals(totals) {
+    if (!totals) return;
+    document.getElementById('class-totals-grid').innerHTML =
+      ['A','D','F'].map(function(b) {
+        return '<div class="ct-card">' +
+          '<div class="ct-block">Block ' + b + '</div>' +
+          '<div class="ct-pts">' + (totals[b] || 0) + '</div>' +
+          '<div style="font-size:.82rem;color:#777">total points</div>' +
+          '</div>';
+      }).join('');
+  }
+
+  // ── Filters ───────────────────────────────────
+  function applyFilters() {
+    var block     = document.getElementById('filter-block').value;
+    var worksheet = document.getElementById('filter-worksheet').value;
+    var name      = document.getElementById('filter-name').value.toLowerCase();
+    var filtered  = allRows.filter(function(r) {
+      if (block     && r.block     !== block)                 return false;
+      if (worksheet && r.worksheet !== worksheet)             return false;
+      if (name      && r.name.toLowerCase().indexOf(name) === -1) return false;
+      return true;
+    });
+    renderScoresTable(filtered);
+  }
+
+  // ── Scores table ──────────────────────────────
+  function renderScoresTable(rows) {
+    var tbody = document.getElementById('scores-body');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-msg">No submissions found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(function(r) {
+      return '<tr>' +
+        '<td style="color:#aaa;font-size:.8rem">' + r.rowIndex + '</td>' +
+        '<td style="font-size:.8rem">' + r.timestamp + '</td>' +
+        '<td><strong>' + r.name + '</strong></td>' +
+        '<td><span class="block-badge block-' + r.block + '">Block ' + r.block + '</span></td>' +
+        '<td>' + formatWS(r.worksheet) + '</td>' +
+        '<td><strong>' + r.points + '</strong></td>' +
+        '<td>' + r.total + '</td>' +
+        '<td><button class="delete-btn" onclick="promptDelete(' + r.rowIndex + ',\'' +
+          r.name + '\',\'' + r.worksheet + '\',' + r.points + ')">🗑 Delete</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function formatWS(id) {
+    var map = {
+      'parts-of-speech':   'Parts of Speech',
+      'parts-of-sentence': 'Parts of a Sentence',
+      'phrases':           'Phrases',
+      'clauses':           'Clauses & Types',
+      'cumulative':        'Grand Challenge'
+    };
+    return map[id] || id;
+  }
+
+  // ── Summary tab ───────────────────────────────
+  function renderSummary() {
+    var WS = ['parts-of-speech','parts-of-sentence','phrases','clauses','cumulative'];
+    var students = {};
+    allRows.forEach(function(r) {
+      var key = r.block + '__' + r.name;
+      if (!students[key]) students[key] = { name: r.name, block: r.block, scores: {} };
+      if (!students[key].scores[r.worksheet] ||
+           r.points > students[key].scores[r.worksheet]) {
+        students[key].scores[r.worksheet] = r.points;
+      }
+    });
+    var rows = Object.values(students)
+      .sort(function(a,b) {
+        return a.block.localeCompare(b.block) || a.name.localeCompare(b.name);
+      });
+    var tbody = document.getElementById('summary-body');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-msg">No data yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(function(s) {
+      var total = WS.reduce(function(sum,ws) { return sum + (s.scores[ws] || 0); }, 0);
+      return '<tr>' +
+        '<td><strong>' + s.name + '</strong></td>' +
+        '<td><span class="block-badge block-' + s.block + '">Block ' + s.block + '</span></td>' +
+        WS.map(function(ws) {
+          return '<td>' + (s.scores[ws] !== undefined ? s.scores[ws] : '—') + '</td>';
+        }).join('') +
+        '<td><strong>' + total + '</strong></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  // ── Delete ────────────────────────────────────
+  var pendingDeleteRow = null;
+
+  function promptDelete(rowIndex, name, worksheet, points) {
+    pendingDeleteRow = rowIndex;
+    document.getElementById('confirm-msg').textContent =
+      'Delete ' + name + "'s " + formatWS(worksheet) +
+      ' submission (' + points + ' pts)? This cannot be undone.';
+    document.getElementById('confirm-overlay').classList.add('show');
+  }
+
+  function cancelDelete() {
+    pendingDeleteRow = null;
+    document.getElementById('confirm-overlay').classList.remove('show');
+  }
+
+  function confirmDelete() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    if (!pendingDeleteRow) return;
+    var img = new Image();
+    img.src = SHEET_URL + '?secret=' + SHEET_SECRET +
+              '&mode=delete&rowIndex=' + pendingDeleteRow;
+    setTimeout(function() {
+      loadSheetData();
+      pendingDeleteRow = null;
+    }, 2000);
+  }
+
+  // ── Export CSV ────────────────────────────────
+  function exportCSV() {
+    var csv = 'Timestamp,Name,Block,Worksheet,Points,Total\n';
+    allRows.forEach(function(r) {
+      csv += '"' + r.timestamp + '","' + r.name + '","' + r.block +
+             '","' + r.worksheet + '",' + r.points + ',' + r.total + '\n';
+    });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+    a.download = 'grammar-quest-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+  }
+
+  // ── Reset local ───────────────────────────────
+  function resetLocal() {
+    if (!confirm('Clear all local data on this device?')) return;
+    ['gg_leaderboard','gg_scores','gg_student'].forEach(function(k) {
+      localStorage.removeItem(k);
+    });
+    alert('Local data cleared.');
+  }
+
+  // ── Init ──────────────────────────────────────
+  GG.renderScoreboardBar();
+  loadSheetData();
+
+</script>
+</body>
+</html>
