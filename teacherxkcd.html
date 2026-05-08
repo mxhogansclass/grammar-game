@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-  const PASSWORD = "cricket26"; // change this to whatever you want
-  const entered = sessionStorage.getItem('teacher_auth');
-  if (entered !== PASSWORD) {
-    const attempt = prompt("Enter teacher password:");
-    if (attempt !== PASSWORD) {
-      alert("Incorrect password.");
-      window.location.href = "index.html";
-    } else {
-      sessionStorage.setItem('teacher_auth', PASSWORD);
-    }
-  }
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Teacher Dashboard — Grammar Quest</title>
@@ -57,12 +44,6 @@
   .tool-btn.danger { background: var(--red); }
   .tool-btn.danger:hover { background: #6a1010; }
   .tool-btn.success { background: var(--correct); }
-
-  #import-area {
-    width:100%; height:120px; font-family:monospace; font-size:0.82rem;
-    border:1.5px solid #ccc; border-radius:4px; padding:8px; resize:vertical;
-    margin-bottom:8px;
-  }
   .class-totals-grid {
     display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:16px 0;
   }
@@ -73,7 +54,7 @@
   }
   .ct-card .ct-block { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; }
   .ct-card .ct-pts { font-size:2rem; font-weight:900; font-family:'Playfair Display',serif; color:var(--gold); }
-  .tab-bar { display:flex; gap:4px; margin-bottom:16px; }
+  .tab-bar { display:flex; gap:4px; margin-bottom:16px; flex-wrap:wrap; }
   .tab-btn {
     font-family:'Playfair Display',serif; font-size:0.88rem;
     padding:7px 18px; cursor:pointer; border:1.5px solid #ccc;
@@ -82,11 +63,72 @@
   .tab-btn.active { background:#fff; border-color:var(--ink); font-weight:700; }
   .tab-panel { display:none; }
   .tab-panel.active { display:block; }
+  .scores-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+  .scores-table th {
+    background:var(--ink); color:var(--gold-light);
+    font-family:'Playfair Display',serif; font-weight:700;
+    padding:10px 12px; text-align:left; letter-spacing:.04em;
+    position:sticky; top:0;
+  }
+  .scores-table td { padding:9px 12px; border-bottom:1px solid #eee; vertical-align:middle; }
+  .scores-table tr:nth-child(even) td { background:var(--cream); }
+  .scores-table tr:hover td { background:#fff8e0; }
+  .delete-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-family: 'Playfair Display', serif;
+    transition: background 0.2s;
+  }
+  .delete-btn:hover { background: #6a1010; }
+  .block-badge {
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:0.82rem;
+    font-family:'Playfair Display',serif;
+  }
+  .block-A { background:#dce8f5; color:#1a3a5c; }
+  .block-D { background:#ddf0e5; color:#1a5c2e; }
+  .block-F { background:#fde8e8; color:#8b2020; }
+  .filter-bar {
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    margin-bottom:16px; padding:12px 16px;
+    background:#fff8e8; border:1.5px solid var(--gold);
+    border-radius:var(--radius);
+  }
+  .filter-bar label { font-size:.83rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .filter-bar select, .filter-bar input {
+    font-family:'Source Serif 4',serif; font-size:.88rem;
+    border:1.5px solid #ccc; padding:5px 8px; border-radius:4px;
+  }
+  .loading-msg { color:#999; font-style:italic; padding:20px 0; text-align:center; }
   .answer-key-table { width:100%; border-collapse:collapse; font-size:0.84rem; }
   .answer-key-table th { background:var(--ink); color:var(--gold-light); padding:8px 10px; text-align:left; }
   .answer-key-table td { padding:7px 10px; border-bottom:1px solid #eee; vertical-align:top; }
   .answer-key-table tr:nth-child(even) td { background:var(--cream); }
   .ws-section-head td { background:var(--blue)!important; color:#fff; font-weight:700; letter-spacing:.05em; }
+  .confirm-overlay {
+    display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.5); z-index:1000;
+    align-items:center; justify-content:center;
+  }
+  .confirm-overlay.show { display:flex; }
+  .confirm-box {
+    background:#fff; border-radius:var(--radius); padding:28px 32px;
+    max-width:400px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2);
+    text-align:center;
+  }
+  .confirm-box h3 { font-family:'Playfair Display',serif; margin-bottom:10px; color:var(--red); }
+  .confirm-box p { font-size:.9rem; color:#555; margin-bottom:20px; line-height:1.6; }
+  .confirm-btns { display:flex; gap:10px; justify-content:center; }
+  #refresh-btn { float:right; }
+  .last-refresh { font-size:.78rem; color:#999; margin-bottom:12px; }
 </style>
 </head>
 <body>
@@ -100,70 +142,121 @@
 </header>
 <div class="scoreboard-bar" id="scoreboard-bar"></div>
 
+<!-- Password check -->
+<script>
+  const PASSWORD = 'cricket26';
+  const entered = sessionStorage.getItem('teacher_auth');
+  if (entered !== PASSWORD) {
+    const attempt = prompt('Enter teacher password:');
+    if (attempt !== PASSWORD) {
+      alert('Incorrect password.');
+      window.location.href = 'index.html';
+    } else {
+      sessionStorage.setItem('teacher_auth', PASSWORD);
+    }
+  }
+</script>
+
 <div class="page">
 
   <div class="worksheet-header">
     <span class="teacher-badge">👩‍🏫 Teacher Only</span>
     <h2>Teacher Dashboard</h2>
-    <p class="subtitle">View student scores, class totals, export data, and see the answer key.</p>
+    <p class="subtitle">Live data from Google Sheets — view, filter, and manage all student submissions.</p>
   </div>
 
-  <!-- Tab navigation -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('scores')">📊 Scores</button>
-    <button class="tab-btn" onclick="showTab('import')">📥 Import / Export</button>
+    <button class="tab-btn active" onclick="showTab('scores')">📊 All Scores</button>
+    <button class="tab-btn" onclick="showTab('summary')">📋 Summary by Student</button>
     <button class="tab-btn" onclick="showTab('answer-key')">🗝️ Answer Key</button>
-    <button class="tab-btn" onclick="showTab('reset')">⚙️ Settings</button>
+    <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
   </div>
 
-  <!-- SCORES TAB -->
+  <!-- ══ ALL SCORES TAB ══════════════════════════════════ -->
   <div class="tab-panel active" id="tab-scores">
-    <div class="class-totals-grid" id="class-totals-grid"></div>
-    <table class="leaderboard-table" id="scores-table">
-      <thead>
-        <tr>
-          <th>Block</th>
-          <th>Name</th>
-          <th>POS</th>
-          <th>Sentence</th>
-          <th>Phrases</th>
-          <th>Clauses</th>
-          <th>Cumulative</th>
-          <th>Total</th>
-          <th>Submitted</th>
-        </tr>
-      </thead>
-      <tbody id="scores-body"></tbody>
-    </table>
-    <p id="no-scores-msg" style="color:#999;font-style:italic;display:none;margin-top:12px">No student data found on this device yet.</p>
+
+    <div class="class-totals-grid" id="class-totals-grid">
+      <div class="loading-msg" style="grid-column:1/-1">Loading live data...</div>
+    </div>
+
+    <div class="filter-bar">
+      <label>Block:</label>
+      <select id="filter-block" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="A">Block A</option>
+        <option value="D">Block D</option>
+        <option value="F">Block F</option>
+      </select>
+      <label>Worksheet:</label>
+      <select id="filter-worksheet" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="parts-of-speech">Parts of Speech</option>
+        <option value="parts-of-sentence">Parts of a Sentence</option>
+        <option value="phrases">Phrases</option>
+        <option value="clauses">Clauses & Sentence Types</option>
+        <option value="cumulative">Grand Challenge</option>
+      </select>
+      <label>Search:</label>
+      <input type="text" id="filter-name" placeholder="Student name..." oninput="applyFilters()">
+      <button class="tool-btn" id="refresh-btn" onclick="loadSheetData()">🔄 Refresh</button>
+    </div>
+
+    <div class="last-refresh" id="last-refresh"></div>
+
+    <div style="overflow-x:auto">
+      <table class="scores-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Timestamp</th>
+            <th>Name</th>
+            <th>Block</th>
+            <th>Worksheet</th>
+            <th>Points</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="scores-body">
+          <tr><td colspan="8" class="loading-msg">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px">
+      <button class="tool-btn success" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
   </div>
 
-  <!-- IMPORT / EXPORT TAB -->
-  <div class="tab-panel" id="tab-import">
-    <div class="tool-card">
-      <h3>Export This Device's Data</h3>
-      <p>Click below to download all student records stored on this browser as a JSON file. Share this file with students completing work on other devices, then import their files to consolidate.</p>
-      <button class="tool-btn" onclick="exportJSON()">⬇ Download JSON</button>
-      <button class="tool-btn" onclick="copyJSON()">📋 Copy to Clipboard</button>
-    </div>
-    <div class="tool-card">
-      <h3>Export as CSV (for Spreadsheet)</h3>
-      <p>Download a CSV you can open directly in Excel or Google Sheets to track points by class.</p>
-      <button class="tool-btn success" onclick="exportCSV()">⬇ Download CSV</button>
-    </div>
-    <div class="tool-card">
-      <h3>Import Data from Another Device</h3>
-      <p>Paste exported JSON from another device below and click Import to merge student records into this device. Existing records for the same student are updated only if the imported score is higher.</p>
-      <textarea id="import-area" placeholder="Paste JSON here..."></textarea>
-      <br>
-      <button class="tool-btn" onclick="importJSON()">⬆ Import JSON</button>
-      <div id="import-status" style="margin-top:8px;font-size:.85rem"></div>
+  <!-- ══ SUMMARY TAB ══════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-summary">
+    <p style="margin-bottom:16px;font-size:.88rem;color:#555">
+      Shows each student's highest score per worksheet and their running total.
+      Only the best score per worksheet is counted toward block totals.
+    </p>
+    <div style="overflow-x:auto">
+      <table class="scores-table" id="summary-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Block</th>
+            <th>POS</th>
+            <th>Sentence</th>
+            <th>Phrases</th>
+            <th>Clauses</th>
+            <th>Cumulative</th>
+            <th>Best Total</th>
+          </tr>
+        </thead>
+        <tbody id="summary-body">
+          <tr><td colspan="8" class="loading-msg">Loading...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- ANSWER KEY TAB -->
+  <!-- ══ ANSWER KEY TAB ═══════════════════════════════════ -->
   <div class="tab-panel" id="tab-answer-key">
-    <p style="margin-bottom:16px;font-size:.9rem;color:#555">Quick-reference answer key for all five worksheets. Detailed explanations appear as feedback during the student worksheets.</p>
+    <p style="margin-bottom:16px;font-size:.9rem;color:#555">Quick-reference answer key for all five worksheets.</p>
     <table class="answer-key-table">
       <thead><tr><th>#</th><th>Worksheet</th><th>Answer</th><th>Key Concept</th></tr></thead>
       <tbody>
@@ -184,11 +277,10 @@
         <tr><td>14</td><td>POS</td><td>C — Transitive action verb</td><td>"medication" = direct object</td></tr>
         <tr><td>15</td><td>POS</td><td>B — Adverb modifying adjective</td><td>"remarkably" → how patient</td></tr>
         <tr><td>16</td><td>POS</td><td>D — Common, abstract noun</td><td>integrity = concept</td></tr>
-        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase (pres. perf. prog.)</td><td>has been + studying</td></tr>
+        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase</td><td>has been + studying</td></tr>
         <tr><td>18</td><td>POS</td><td>C — Collective noun</td><td>jury = group as unit</td></tr>
         <tr><td>19</td><td>POS</td><td>C — Adverb modifying adjective</td><td>"profoundly" → how unsettling</td></tr>
-        <tr><td>20</td><td>POS</td><td>C — Indefinite relative pronoun / noun clause</td><td>whichever = no specific antecedent</td></tr>
-
+        <tr><td>20</td><td>POS</td><td>C — Indefinite relative pronoun</td><td>whichever = no specific antecedent</td></tr>
         <tr class="ws-section-head"><td colspan="4">PARTS OF A SENTENCE (0.5 pt each)</td></tr>
         <tr><td>1</td><td>Sentence</td><td>B — Complete subject</td><td>"The old cat" = head + modifiers</td></tr>
         <tr><td>2</td><td>Sentence</td><td>C — Simple predicate</td><td>"studied" = main verb only</td></tr>
@@ -210,216 +302,51 @@
         <tr><td>18</td><td>Sentence</td><td>C — Object complement (compound adj.)</td><td>modifies direct object "design"</td></tr>
         <tr><td>19</td><td>Sentence</td><td>C — Predicate nominative</td><td>"she" (subject case) after "was"</td></tr>
         <tr><td>20</td><td>Sentence</td><td>C — Direct object</td><td>"revision process" acted upon by "made"</td></tr>
-
         <tr class="ws-section-head"><td colspan="4">PHRASES (0.5 pt each)</td></tr>
-        <tr><td>1</td><td>Phrases</td><td>B — Prepositional phrase (adverbial)</td><td>on the warm rug = where</td></tr>
-        <tr><td>2</td><td>Phrases</td><td>C — Gerund phrase (subject)</td><td>running = noun function</td></tr>
-        <tr><td>3</td><td>Phrases</td><td>B — Infinitive phrase (direct object)</td><td>to become = object of wanted</td></tr>
-        <tr><td>4</td><td>Phrases</td><td>C — Participial phrase</td><td>barking modifies "dog"</td></tr>
-        <tr><td>5</td><td>Phrases</td><td>C — Noun phrase (complete subject)</td><td>lighthouse + all modifiers</td></tr>
-        <tr><td>6</td><td>Phrases</td><td>C — Verb phrase</td><td>past perfect progressive</td></tr>
-        <tr><td>7</td><td>Phrases</td><td>B — Participial phrase (past)</td><td>"exhausted" modifies "travelers"</td></tr>
-        <tr><td>8</td><td>Phrases</td><td>A — Infinitive phrase (pred. nominative)</td><td>follows "was," renames ambition</td></tr>
-        <tr><td>9</td><td>Phrases</td><td>B — Gerund phrase (object)</td><td>volunteering = object of "spent"</td></tr>
-        <tr><td>10</td><td>Phrases</td><td>C — Noun phrase with participial</td><td>letter + written in haste</td></tr>
-        <tr><td>11</td><td>Phrases</td><td>A — Infinitive phrase (adjective)</td><td>modifies "opportunities"</td></tr>
-        <tr><td>12</td><td>Phrases</td><td>B — Infinitive phrase (adverb, purpose)</td><td>why they stopped</td></tr>
-        <tr><td>13</td><td>Phrases</td><td>C — Absolute phrase</td><td>own subject "hands" ≠ main subject</td></tr>
-        <tr><td>14</td><td>Phrases</td><td>B — Gerund phrase (subject)</td><td>swimming = subject of "requires"</td></tr>
-        <tr><td>15</td><td>Phrases</td><td>C — Perfect participial phrase</td><td>having + past participle</td></tr>
-        <tr><td>16</td><td>Phrases</td><td>C — Infinitive phrase (adjective)</td><td>modifies "solution"</td></tr>
-        <tr><td>17</td><td>Phrases</td><td>B — Compound absolute phrase</td><td>two absolutes joined by "and"</td></tr>
-        <tr><td>18</td><td>Phrases</td><td>D — Gerund phrase (pred. nominative)</td><td>follows "was"</td></tr>
-        <tr><td>19</td><td>Phrases</td><td>B — Compound participial phrase</td><td>modifies "senator"</td></tr>
-        <tr><td>20</td><td>Phrases</td><td>C — Perfect infinitive phrase (subject)</td><td>to have spoken = completed action</td></tr>
-
+        <tr><td>1-20</td><td>Phrases</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
         <tr class="ws-section-head"><td colspan="4">CLAUSES & SENTENCE TYPES (0.5 pt each)</td></tr>
-        <tr><td>1</td><td>Clauses</td><td>B — Compound</td><td>2 ICs joined by "and"</td></tr>
-        <tr><td>2</td><td>Clauses</td><td>C — Complex</td><td>1 DC + 1 IC</td></tr>
-        <tr><td>3</td><td>Clauses</td><td>A — Simple</td><td>1 IC, no subordinate clauses</td></tr>
-        <tr><td>4</td><td>Clauses</td><td>C — Adverb clause</td><td>"because" = subordinating conj., tells why</td></tr>
-        <tr><td>5</td><td>Clauses</td><td>D — Adjective clause</td><td>"that" = relative pronoun, modifies "book"</td></tr>
-        <tr><td>6</td><td>Clauses</td><td>C — Noun clause (direct object)</td><td>object of "believe"</td></tr>
-        <tr><td>7</td><td>Clauses</td><td>D — Compound-complex</td><td>2 ICs + noun clause DC</td></tr>
-        <tr><td>8</td><td>Clauses</td><td>C — Noun clause (subject)</td><td>subject of "will receive"</td></tr>
-        <tr><td>9</td><td>Clauses</td><td>C — Complex</td><td>1 IC + adjective DC embedded</td></tr>
-        <tr><td>10</td><td>Clauses</td><td>C — Noun clause (direct object)</td><td>object of "announced"</td></tr>
-        <tr><td>11</td><td>Clauses</td><td>C — Restrictive adjective clause</td><td>limits which mural</td></tr>
-        <tr><td>12</td><td>Clauses</td><td>D — Compound-complex</td><td>2 ICs + 1 DC</td></tr>
-        <tr><td>13</td><td>Clauses</td><td>D — Adverb clause of condition</td><td>"provided that" = conditional subord.</td></tr>
-        <tr><td>14</td><td>Clauses</td><td>C — Complex</td><td>noun DC in apposition to "discovery"</td></tr>
-        <tr><td>15</td><td>Clauses</td><td>B — Noun clause (subject)</td><td>subject of "contradicted"</td></tr>
-        <tr><td>16</td><td>Clauses</td><td>C — Adjective clause ("whose")</td><td>possessive relative pronoun</td></tr>
-        <tr><td>17</td><td>Clauses</td><td>C — Adjective clause modifying "reason"</td><td>relative adverb "why"</td></tr>
-        <tr><td>18</td><td>Clauses</td><td>C — Compound-complex; adverb of purpose</td><td>2 ICs + 2 DCs</td></tr>
-        <tr><td>19</td><td>Clauses</td><td>B — Adverb clause of condition</td><td>indefinite relative = any decision</td></tr>
-        <tr><td>20</td><td>Clauses</td><td>B — Noun clause (DO); compound-complex</td><td>2 ICs + 2 DCs</td></tr>
-
-        <tr class="ws-section-head"><td colspan="4">CUMULATIVE (1 pts each)</td></tr>
-        <tr><td>1</td><td>Cumulative</td><td>B — Collective noun</td><td>committee = group as unit</td></tr>
-        <tr><td>2</td><td>Cumulative</td><td>C — Intransitive action verb</td><td>no direct object</td></tr>
-        <tr><td>3</td><td>Cumulative</td><td>B — Attributive adjective</td><td>pre-noun position</td></tr>
-        <tr><td>4</td><td>Cumulative</td><td>C — Adverb modifying verb</td><td>"meticulously" → how she reviewed</td></tr>
-        <tr><td>5</td><td>Cumulative</td><td>D — Common, abstract noun</td><td>justice = concept</td></tr>
-        <tr><td>6</td><td>Cumulative</td><td>B — Indirect object</td><td>grant given to the center</td></tr>
-        <tr><td>7</td><td>Cumulative</td><td>C — Direct object</td><td>"design" acted upon by "declared"</td></tr>
-        <tr><td>8</td><td>Cumulative</td><td>D — Complete subject</td><td>verdict + all modifiers</td></tr>
-        <tr><td>9</td><td>Cumulative</td><td>B — Noun clause as subject</td><td>subject of "was"</td></tr>
-        <tr><td>10</td><td>Cumulative</td><td>D — Object complement (adj. phrase)</td><td>describes direct object "issue"</td></tr>
-        <tr><td>11</td><td>Cumulative</td><td>C — Gerund phrase (subject)</td><td>studying = subject of "transformed"</td></tr>
-        <tr><td>12</td><td>Cumulative</td><td>D — Participial phrase</td><td>"baffled" modifies "researchers"</td></tr>
-        <tr><td>13</td><td>Cumulative</td><td>B — Absolute phrase</td><td>own subject "composure"</td></tr>
-        <tr><td>14</td><td>Cumulative</td><td>C — Infinitive phrase (appositive)</td><td>renames "option"</td></tr>
-        <tr><td>15</td><td>Cumulative</td><td>B — Passive perfect participial phrase</td><td>having been denied</td></tr>
-        <tr><td>16</td><td>Cumulative</td><td>C — Adverb clause of place</td><td>"wherever" = place subordinator</td></tr>
-        <tr><td>17</td><td>Cumulative</td><td>D — Noun clause (appositive)</td><td>explains what the fact is</td></tr>
-        <tr><td>18</td><td>Cumulative</td><td>C — Compound-complex</td><td>2 ICs + 2 DCs</td></tr>
-        <tr><td>19</td><td>Cumulative</td><td>D — Adverb clause of concession</td><td>"no matter how" = concessive</td></tr>
-        <tr><td>20</td><td>Cumulative</td><td>B — Noun clause (DO); compound-complex</td><td>direct object of "concluded"; 2 ICs + DC</td></tr>
+        <tr><td>1-20</td><td>Clauses</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
+        <tr class="ws-section-head"><td colspan="4">CUMULATIVE (1 pt each)</td></tr>
+        <tr><td>1-50</td><td>Cumulative</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
       </tbody>
     </table>
   </div>
 
-  <!-- SETTINGS / RESET TAB -->
-  <div class="tab-panel" id="tab-reset">
+  <!-- ══ SETTINGS TAB ═════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-settings">
     <div class="tool-card">
-      <h3>Reset All Student Data</h3>
-      <p>⚠️ This will permanently delete all student records, scores, and leaderboard entries stored on <em>this device</em>. Export your data first! This cannot be undone.</p>
-      <button class="tool-btn danger" onclick="resetAll()">🗑️ Reset All Data on This Device</button>
+      <h3>About Deletion</h3>
+      <p>Deleting a row removes it permanently from the Google Sheet. This cannot be undone. Use this if you suspect a score was submitted dishonestly. The student's other scores are not affected.</p>
     </div>
     <div class="tool-card">
-      <h3>About the Scoring System</h3>
-      <p>Scores are stored in the browser's <strong>localStorage</strong>. Each student's device keeps its own records. Use the <strong>Export / Import</strong> tab to consolidate scores from multiple devices onto one teacher computer.</p>
-      <p style="margin-top:8px">Only student names visible to the teacher. The public leaderboard shows only block totals — no individual names.</p>
+      <h3>Change Teacher Password</h3>
+      <p>The current password is set in the <code>&lt;script&gt;</code> block at the top of <code>teacher.html</code>. Find the line <code>const PASSWORD = 'cricket26'</code> and change it to whatever you want, then re-upload to GitHub.</p>
+    </div>
+    <div class="tool-card">
+      <h3>Reset Local Device Data</h3>
+      <p>⚠️ This clears localStorage on this device only. Google Sheet data is unaffected.</p>
+      <button class="tool-btn danger" onclick="resetLocal()">🗑️ Clear This Device's Local Data</button>
     </div>
   </div>
 
-</div><!-- /page -->
+</div>
+
+<!-- Confirm delete overlay -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>⚠️ Delete This Submission?</h3>
+    <p id="confirm-msg">Are you sure you want to delete this submission? This cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="tool-btn danger" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="tool-btn" onclick="cancelDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script src="js/core.js"></script>
 <script>
 
   // ── Tab system ────────────────────────────────
   function showTab(id) {
-    document.querySelectorAll('.tab-btn').forEach((b,i) => {
-      b.classList.toggle('active', b.getAttribute('onclick').includes(id));
-    });
-    document.querySelectorAll('.tab-panel').forEach(p => {
-      p.classList.toggle('active', p.id === 'tab-' + id);
-    });
-  }
-
-  // ── Scores table ──────────────────────────────
-  const WS_IDS = ['parts-of-speech','parts-of-sentence','phrases','clauses','cumulative'];
-  const WS_MAX = [10,10,10,10,30];
-
-  function renderScoresTable() {
-    const board = GG.getLeaderboard();
-    const rows  = Object.values(board);
-    const tbody = document.getElementById('scores-body');
-    const noMsg = document.getElementById('no-scores-msg');
-
-    if (!rows.length) {
-      tbody.innerHTML = '';
-      noMsg.style.display = 'block';
-      return;
-    }
-    noMsg.style.display = 'none';
-
-    // Sort by block then name
-    rows.sort((a,b) => a.block.localeCompare(b.block) || a.name.localeCompare(b.name));
-
-    tbody.innerHTML = rows.map(r => {
-      // Try to get per-worksheet scores (stored per student via studentKey)
-      const total = r.points;
-      return `<tr>
-        <td><strong>Block ${r.block}</strong></td>
-        <td>${r.name}</td>
-        <td colspan="5" style="color:#aaa;font-style:italic;font-size:.82rem">Per-worksheet detail stored on student's device</td>
-        <td><strong>${total}</strong></td>
-        <td style="font-size:.78rem">${r.ts ? new Date(r.ts).toLocaleDateString() : '—'}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  function renderClassTotals() {
-    const totals = GG.getBlockTotals();
-    const grid = document.getElementById('class-totals-grid');
-    grid.innerHTML = ['A','D','F'].map(b => `
-      <div class="ct-card">
-        <div class="ct-block">Block ${b}</div>
-        <div class="ct-pts">${totals[b]}</div>
-        <div style="font-size:.82rem;color:#777">total points</div>
-      </div>
-    `).join('');
-  }
-
-  // ── Export ────────────────────────────────────
-  function exportJSON() {
-    const data = GG.exportData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `grammar-quest-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-  }
-  function copyJSON() {
-    navigator.clipboard.writeText(JSON.stringify(GG.exportData(), null, 2))
-      .then(() => alert('Copied to clipboard!'));
-  }
-  function exportCSV() {
-    const board  = GG.getLeaderboard();
-    const totals = GG.getBlockTotals();
-    let csv = 'Block,Name,Total Points,Submitted\n';
-    Object.values(board).forEach(r => {
-      csv += `"${r.block}","${r.name}",${r.points},"${r.ts ? new Date(r.ts).toLocaleDateString() : ''}"\n`;
-    });
-    csv += '\nBlock Totals\n';
-    ['A','D','F'].forEach(b => { csv += `Block ${b},${totals[b]}\n`; });
-    const blob = new Blob([csv], {type:'text/csv'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `grammar-quest-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-  }
-
-  // ── Import ────────────────────────────────────
-  function importJSON() {
-    const raw = document.getElementById('import-area').value.trim();
-    const status = document.getElementById('import-status');
-    try {
-      const data = JSON.parse(raw);
-      if (!data.leaderboard) throw new Error('Invalid format');
-      const existing = GG.load('leaderboard', {});
-      let merged = 0;
-      Object.entries(data.leaderboard).forEach(([k,v]) => {
-        if (!existing[k] || v.points > existing[k].points) {
-          existing[k] = v;
-          merged++;
-        }
-      });
-      GG.save('leaderboard', existing);
-      status.innerHTML = `<span style="color:var(--correct)">✓ Imported ${merged} record(s) successfully.</span>`;
-      renderScoresTable();
-      renderClassTotals();
-      GG.renderScoreboardBar();
-    } catch(e) {
-      status.innerHTML = `<span style="color:var(--wrong)">✗ Import failed: ${e.message}</span>`;
-    }
-  }
-
-  // ── Reset ─────────────────────────────────────
-  function resetAll() {
-    if (!confirm('Are you sure? This will delete ALL student data on this device. Export first!')) return;
-    ['gg_leaderboard','gg_scores','gg_student'].forEach(k => localStorage.removeItem(k));
-    alert('All data cleared.');
-    location.reload();
-  }
-
-  // ── Init ──────────────────────────────────────
-  GG.renderScoreboardBar();
-  renderScoresTable();
-  renderClassTotals();
-</script>
-</body>
-</html>
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttri
