@@ -127,20 +127,10 @@
   .confirm-box h3 { font-family:'Playfair Display',serif; margin-bottom:10px; color:var(--red); }
   .confirm-box p { font-size:.9rem; color:#555; margin-bottom:20px; line-height:1.6; }
   .confirm-btns { display:flex; gap:10px; justify-content:center; }
-  #refresh-btn { float:right; }
   .last-refresh { font-size:.78rem; color:#999; margin-bottom:12px; }
 </style>
 </head>
 <body>
-
-<header class="site-header">
-  <h1>Grammar Quest</h1>
-  <nav>
-    <a href="index.html">← Home</a>
-    <a href="leaderboard.html">🏆 Leaderboard</a>
-  </nav>
-</header>
-<div class="scoreboard-bar" id="scoreboard-bar"></div>
 
 <!-- Password check -->
 <script>
@@ -157,6 +147,15 @@
   }
 </script>
 
+<header class="site-header">
+  <h1>Grammar Quest</h1>
+  <nav>
+    <a href="index.html">← Home</a>
+    <a href="leaderboard.html">🏆 Leaderboard</a>
+  </nav>
+</header>
+<div class="scoreboard-bar" id="scoreboard-bar"></div>
+
 <div class="page">
 
   <div class="worksheet-header">
@@ -172,13 +171,11 @@
     <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
   </div>
 
-  <!-- ══ ALL SCORES TAB ══════════════════════════════════ -->
+  <!-- ALL SCORES TAB -->
   <div class="tab-panel active" id="tab-scores">
-
     <div class="class-totals-grid" id="class-totals-grid">
       <div class="loading-msg" style="grid-column:1/-1">Loading live data...</div>
     </div>
-
     <div class="filter-bar">
       <label>Block:</label>
       <select id="filter-block" onchange="applyFilters()">
@@ -193,16 +190,14 @@
         <option value="parts-of-speech">Parts of Speech</option>
         <option value="parts-of-sentence">Parts of a Sentence</option>
         <option value="phrases">Phrases</option>
-        <option value="clauses">Clauses & Sentence Types</option>
+        <option value="clauses">Clauses &amp; Sentence Types</option>
         <option value="cumulative">Grand Challenge</option>
       </select>
       <label>Search:</label>
       <input type="text" id="filter-name" placeholder="Student name..." oninput="applyFilters()">
-      <button class="tool-btn" id="refresh-btn" onclick="loadSheetData()">🔄 Refresh</button>
+      <button class="tool-btn" onclick="loadSheetData()">🔄 Refresh</button>
     </div>
-
     <div class="last-refresh" id="last-refresh"></div>
-
     <div style="overflow-x:auto">
       <table class="scores-table">
         <thead>
@@ -227,14 +222,14 @@
     </div>
   </div>
 
-  <!-- ══ SUMMARY TAB ══════════════════════════════════════ -->
+  <!-- SUMMARY TAB -->
   <div class="tab-panel" id="tab-summary">
     <p style="margin-bottom:16px;font-size:.88rem;color:#555">
-      Shows each student's highest score per worksheet and their running total.
-      Only the best score per worksheet is counted toward block totals.
+      Each student's highest score per worksheet and their running total.
+      Only the best score per worksheet counts toward block totals.
     </p>
     <div style="overflow-x:auto">
-      <table class="scores-table" id="summary-table">
+      <table class="scores-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -254,7 +249,7 @@
     </div>
   </div>
 
-  <!-- ══ ANSWER KEY TAB ═══════════════════════════════════ -->
+  <!-- ANSWER KEY TAB -->
   <div class="tab-panel" id="tab-answer-key">
     <p style="margin-bottom:16px;font-size:.9rem;color:#555">Quick-reference answer key for all five worksheets.</p>
     <table class="answer-key-table">
@@ -265,7 +260,7 @@
         <tr><td>2</td><td>POS</td><td>B — Adverb modifying verb</td><td>"quickly" → how she finished</td></tr>
         <tr><td>3</td><td>POS</td><td>C — Proper, concrete noun</td><td>Chicago = specific city</td></tr>
         <tr><td>4</td><td>POS</td><td>B — Intransitive action verb</td><td>no direct object</td></tr>
-        <tr><td>5</td><td>POS</td><td>C — Attributive adjective</td><td>pre-noun position</td></tr>
+        <tr><td>5</td><td>POS</td><td>C — Adjective modifying noun</td><td>pre-noun position</td></tr>
         <tr><td>6</td><td>POS</td><td>B — Collective noun</td><td>flock = group of geese</td></tr>
         <tr><td>7</td><td>POS</td><td>B — Transitive action verb</td><td>"samples" = direct object</td></tr>
         <tr><td>8</td><td>POS</td><td>C — Common, abstract noun</td><td>freedom = concept, not physical</td></tr>
@@ -277,76 +272,4 @@
         <tr><td>14</td><td>POS</td><td>C — Transitive action verb</td><td>"medication" = direct object</td></tr>
         <tr><td>15</td><td>POS</td><td>B — Adverb modifying adjective</td><td>"remarkably" → how patient</td></tr>
         <tr><td>16</td><td>POS</td><td>D — Common, abstract noun</td><td>integrity = concept</td></tr>
-        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase</td><td>has been + studying</td></tr>
-        <tr><td>18</td><td>POS</td><td>C — Collective noun</td><td>jury = group as unit</td></tr>
-        <tr><td>19</td><td>POS</td><td>C — Adverb modifying adjective</td><td>"profoundly" → how unsettling</td></tr>
-        <tr><td>20</td><td>POS</td><td>C — Indefinite relative pronoun</td><td>whichever = no specific antecedent</td></tr>
-        <tr class="ws-section-head"><td colspan="4">PARTS OF A SENTENCE (0.5 pt each)</td></tr>
-        <tr><td>1</td><td>Sentence</td><td>B — Complete subject</td><td>"The old cat" = head + modifiers</td></tr>
-        <tr><td>2</td><td>Sentence</td><td>C — Simple predicate</td><td>"studied" = main verb only</td></tr>
-        <tr><td>3</td><td>Sentence</td><td>C — Indirect object</td><td>"to whom" = her brother</td></tr>
-        <tr><td>4</td><td>Sentence</td><td>D — Part of complete predicate</td><td>prep phrase as adverbial</td></tr>
-        <tr><td>5</td><td>Sentence</td><td>B — Predicate adjective</td><td>"dark" follows linking verb</td></tr>
-        <tr><td>6</td><td>Sentence</td><td>D — Direct object</td><td>"bone" receives buried</td></tr>
-        <tr><td>7</td><td>Sentence</td><td>B — Complete predicate</td><td>verbs + all modifiers/objects</td></tr>
-        <tr><td>8</td><td>Sentence</td><td>B — Direct object</td><td>contestant acted upon</td></tr>
-        <tr><td>9</td><td>Sentence</td><td>C — Object complement</td><td>renames the direct object</td></tr>
-        <tr><td>10</td><td>Sentence</td><td>D — Indirect object</td><td>to whom story was read</td></tr>
-        <tr><td>11</td><td>Sentence</td><td>B — Complete subject (compound)</td><td>two nouns as subject</td></tr>
-        <tr><td>12</td><td>Sentence</td><td>C — Predicate adjective</td><td>follows linking verb "remained"</td></tr>
-        <tr><td>13</td><td>Sentence</td><td>B — Direct object</td><td>Ms. Rivera acted upon by "elected"</td></tr>
-        <tr><td>14</td><td>Sentence</td><td>C — Object complement (adj.)</td><td>describes direct object "conclusion"</td></tr>
-        <tr><td>15</td><td>Sentence</td><td>B — Predicate nominative</td><td>follows "was," renames noun-clause subject</td></tr>
-        <tr><td>16</td><td>Sentence</td><td>D — Direct object</td><td>"her" acted upon by "considered"</td></tr>
-        <tr><td>17</td><td>Sentence</td><td>C — Noun clause as subject</td><td>"Whoever arrives first" = who arrives</td></tr>
-        <tr><td>18</td><td>Sentence</td><td>C — Object complement (compound adj.)</td><td>modifies direct object "design"</td></tr>
-        <tr><td>19</td><td>Sentence</td><td>C — Predicate nominative</td><td>"she" (subject case) after "was"</td></tr>
-        <tr><td>20</td><td>Sentence</td><td>C — Direct object</td><td>"revision process" acted upon by "made"</td></tr>
-        <tr class="ws-section-head"><td colspan="4">PHRASES (0.5 pt each)</td></tr>
-        <tr><td>1-20</td><td>Phrases</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
-        <tr class="ws-section-head"><td colspan="4">CLAUSES & SENTENCE TYPES (0.5 pt each)</td></tr>
-        <tr><td>1-20</td><td>Clauses</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
-        <tr class="ws-section-head"><td colspan="4">CUMULATIVE (1 pt each)</td></tr>
-        <tr><td>1-50</td><td>Cumulative</td><td colspan="2">See worksheet feedback for full explanations</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ══ SETTINGS TAB ═════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-settings">
-    <div class="tool-card">
-      <h3>About Deletion</h3>
-      <p>Deleting a row removes it permanently from the Google Sheet. This cannot be undone. Use this if you suspect a score was submitted dishonestly. The student's other scores are not affected.</p>
-    </div>
-    <div class="tool-card">
-      <h3>Change Teacher Password</h3>
-      <p>The current password is set in the <code>&lt;script&gt;</code> block at the top of <code>teacher.html</code>. Find the line <code>const PASSWORD = 'cricket26'</code> and change it to whatever you want, then re-upload to GitHub.</p>
-    </div>
-    <div class="tool-card">
-      <h3>Reset Local Device Data</h3>
-      <p>⚠️ This clears localStorage on this device only. Google Sheet data is unaffected.</p>
-      <button class="tool-btn danger" onclick="resetLocal()">🗑️ Clear This Device's Local Data</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Confirm delete overlay -->
-<div class="confirm-overlay" id="confirm-overlay">
-  <div class="confirm-box">
-    <h3>⚠️ Delete This Submission?</h3>
-    <p id="confirm-msg">Are you sure you want to delete this submission? This cannot be undone.</p>
-    <div class="confirm-btns">
-      <button class="tool-btn danger" onclick="confirmDelete()">Yes, Delete</button>
-      <button class="tool-btn" onclick="cancelDelete()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<script src="js/core.js"></script>
-<script>
-
-  // ── Tab system ────────────────────────────────
-  function showTab(id) {
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.toggle('active', b.getAttri
+        <tr><td>17</td><td>POS</td><td>C — Auxiliary phrase</t
