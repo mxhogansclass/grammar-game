@@ -94,12 +94,13 @@ const GG = (() => {
     }
     return getBlockTotals();
   }
-
-  // ── Scoreboard bar renderer ───────────────────
-  function renderScoreboardBar() {
-    const el = document.querySelector('.scoreboard-bar');
-    if (!el) return;
-    const t = getBlockTotals();
+// ── Scoreboard bar renderer ───────────────────
+function renderScoreboardBar() {
+  const el = document.querySelector('.scoreboard-bar');
+  if (!el) return;
+  
+  // Try live sheet first, fall back to local
+  fetchLiveTotals().then(t => {
     el.innerHTML = `<span style="letter-spacing:.06em;font-size:.8rem;opacity:.7">CLASS TOTALS:</span>
       ${['A','D','F'].map(b =>
         `<span class="block-score">
@@ -109,8 +110,8 @@ const GG = (() => {
         </span>`
       ).join('<span style="opacity:.3">|</span>')}
     `;
-  }
-
+  });
+}
   // ── Init student ID widget ────────────────────
   function initStudentWidget(onReady) {
     const wrap = document.getElementById('student-id-section');
